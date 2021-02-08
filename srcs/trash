@@ -1,0 +1,51 @@
+apt install -y vim
+
+service nginx start
+
+#configure mysql
+service mysql start
+mysql -u root < "CREATE DATABASE newdb;
+CREATE USER 'username'@'localhost' IDENTIFIED BY 'userpassword';
+GRANT ALL PRIVILEGES ON newdb.* TO 'username'@'localhost';
+FLUSH PRIVILEGES;
+\q"
+
+vi etc/nginx/sites-available/config
+server {
+    listen 80;
+    listen [::]:80;
+
+    root /var/www/html;
+    index index.php index.html;
+
+	server_name _;
+    location / {
+        try_files $uri $uri/ =404;
+    }
+    location ~ \.php$ {
+        include snippets/fastcgi-php.conf;
+        fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
+    }
+}
+
+ln -s /etc/nginx/sites-available/localhost /etc/nginx/sites-enabled/localhost
+
+rm -rf default
+
+service nginx restart
+
+vim var/www/html/index.php
+<?php phpinfo(); ?>
+
+service php7.3-fpm start
+
+apt install -y php-json php-mbstring
+apt install  -y wget
+wget https://files.phpmyadmin.net/phpMyAdmin/4.9.0.1/phpMyAdmin-4.9.0.1-all-languages.tar.gz
+tar -zxvf phpMyAdmin-4.9.0.1-all-languages.tar.gz
+mv phpMyAdmin-4.9.0.1-all-languages /usr/share/phpMyAdmin
+cp -pr /usr/share/phpMyAdmin/config.sample.inc.php /usr/share/phpMyAdmin/config.inc.php
+mysql < /usr/share/phpMyAdmin/sql/create_tables.sql -u root
+vim /etc/nginx/conf.d/phpMyAdmin.conf
+mkdir /usr/share/phpMyAdmin/tmp
+

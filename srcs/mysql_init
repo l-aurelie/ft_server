@@ -1,0 +1,5 @@
+CREATE DATABASE newdb;
+CREATE USER 'username'@'localhost' IDENTIFIED BY 'userpassword';
+GRANT ALL PRIVILEGES ON newdb.* TO 'username'@'localhost';
+FLUSH PRIVILEGES;
+\q
