@@ -9,7 +9,9 @@ ln -s /etc/nginx/sites-available/localhost /etc/nginx/sites-enabled/localhost
 rm -rf /etc/nginx/sites-enabled/default
 
 chown -R www-data:www-data /var/www/
-chmod -R 644 /var/www/
+find /var/www// -type d -exec chmod 750 {} \;
+find /var/www// -type f -exec chmod 640 {} \;
+#chmod -R 644 /var/www/
 
 
 if [[ "$AUTOINDEX" == "off" ]]
